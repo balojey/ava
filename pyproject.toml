@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ava"
+version = "0.1.0"
+description = ""
+authors = ["Ken Harlbar <balotech514@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "1.0.0"
+pymongo = {extras = ["srv"], version = "^4.7.2"}
+llama-index = "^0.10.36"
+transformers = "^4.40.2"
+torch = "^2.3.0"
+sentence-transformers = "^2.7.0"
+llama-cpp-python = "^0.2.74"
+pypdf2 = "^3.0.1"
+pypdf = "^4.2.0"
+llama-index-embeddings-huggingface = "^0.2.0"
+llama-index-vector-stores-mongodb = "^0.1.5"
+llama-index-llms-llama-api = "^0.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
