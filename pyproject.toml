@@ -19,6 +19,7 @@ pypdf = "^4.2.0"
 llama-index-embeddings-huggingface = "^0.2.0"
 llama-index-vector-stores-mongodb = "^0.1.5"
 llama-index-llms-llama-api = "^0.1.4"
+flet = "^0.22.1"
 
 
 [build-system]

@@ -22,3 +22,5 @@ rad.json
 TestResults.xml
 #Env variables
 .env
+#Resources
+./ava/resources/*

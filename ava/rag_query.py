@@ -30,7 +30,7 @@ else:
 
 # Define DB variables
 DB_NAME = 'ava'
-COLLECTION_NAME = 'astrology'
+COLLECTION_NAME = 'home_automation'
 INDEX_NAME = 'idx_embedding'
 
 # LlamaIndex will download embeddings models as needed
