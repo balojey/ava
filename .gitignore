@@ -23,4 +23,6 @@ TestResults.xml
 #Env variables
 .env
 #Resources
-ava/ava-backend/resources/*
+ava/ava_backend/resources/*
+#Pycache
+__pycache__/

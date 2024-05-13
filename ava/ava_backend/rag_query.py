@@ -7,9 +7,11 @@ from llama_index.core import StorageContext
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex
 from llama_index.llms.llama_api import LlamaAPI
+from llama_index.core import Settings
 
 
 # Setup logging. To see more logging, set the level to DEBUG
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
@@ -43,12 +45,14 @@ mongodb_client = pymongo.MongoClient(ATLAS_URI)
 """ Setup Embedding Model """
 
 embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+Settings.embed_model = embed_model
 
 """ Setup LLM """
 
 api_key = config.get("LLAMA_API_KEY")
 llm = LlamaAPI(api_key=api_key)
-service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
+Settings.llm = llm
+# service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
 
 """ Connect Llama-index and MongoDB Atlas """
 vector_store = MongoDBAtlasVectorSearch(mongodb_client = mongodb_client,
@@ -58,10 +62,11 @@ vector_store = MongoDBAtlasVectorSearch(mongodb_client = mongodb_client,
 storage_context = StorageContext.from_defaults(vector_store=vector_store)
 index = VectorStoreIndex.from_vector_store(
     vector_store=vector_store,
-    service_context=service_context,
+    # service_context=service_context,
 )
 
-while True:
-    query: str = str(input("\n\nQuery? "))
-    response = index.as_query_engine().query(query)
-    print(response)
+if __name__ == "__main__":
+    while True:
+        query: str = str(input("\n\nQuery? "))
+        response = index.as_query_engine().query(query)
+        print(response.response)
