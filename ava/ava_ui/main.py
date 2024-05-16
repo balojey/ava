@@ -107,4 +107,4 @@ def main(page: ft.Page):
     # )
     page.add(ChatPage(page))
 
-ft.app(main, port=8008, export_asgi_app=True)
+ft.app(main, port=8080, export_asgi_app=True)
