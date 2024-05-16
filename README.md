@@ -21,7 +21,7 @@ This application was brought to life using the following technologies
 
 *Option 1*
 
-Use Gitpod: go to [https://gitpod/#https://github.com/balojey/ava](https://gitpod/#https://github.com/balojey/ava)
+Use Gitpod: go to [https://gitpod.io/#https://github.com/balojey/ava](https://gitpod/#https://github.com/balojey/ava)
 
 All dependencies will be installed automatically
 
