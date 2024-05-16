@@ -2,7 +2,7 @@
 
 (Live app)[]
 
-(Project Writeup)[https://peaceful-sleep-735.notion.site/Ava-Empowering-SUI-MOVE-Developers-An-AI-Chat-App-Leveraging-Atlas-MongoDB-1223f4d8a27d48dd81ca281b328a1282?pvs=4]
+[Project Writeup](https://peaceful-sleep-735.notion.site/Ava-Empowering-SUI-MOVE-Developers-An-AI-Chat-App-Leveraging-Atlas-MongoDB-1223f4d8a27d48dd81ca281b328a1282?pvs=4)
 
 Ava is a GPT chat model perfectly geered towards Sui/Move developers due to lack of AI support in the domain.
 
