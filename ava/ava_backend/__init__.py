@@ -1,0 +1,1 @@
+from .rag_query import mongodb_client, index

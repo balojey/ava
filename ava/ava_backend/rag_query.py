@@ -8,12 +8,16 @@ from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex
 from llama_index.llms.llama_api import LlamaAPI
 from llama_index.core import Settings
+from llama_index.core.llms import MockLLM
+# from llama_index.llms.gemini import Gemini
+# from llama_index.llms.huggingface import HuggingFaceLLM
+# from llama_index.core import PromptTemplate
 
 
 # Setup logging. To see more logging, set the level to DEBUG
 # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 """ Load Settings """
 
@@ -51,6 +55,8 @@ Settings.embed_model = embed_model
 
 api_key = config.get("LLAMA_API_KEY")
 llm = LlamaAPI(api_key=api_key)
+# llm = Gemini(api_key=os.getenv("GEMINI_API_KEY"))
+# llm = MockLLM()
 Settings.llm = llm
 # service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
 
@@ -81,6 +87,6 @@ if __name__ == "__main__":
     )
     while True:
         query: str = str(input("\n\nQuery? "))
-        response = chat_engine.stream_chat(query)
+        response = chat_engine.chat(query)
         print(response)
     chat_engine.reset()

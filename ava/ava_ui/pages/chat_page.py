@@ -1,5 +1,5 @@
 import flet as ft
-# from ava.ava_backend.rag_query import index
+from llama_index.core.base.llms.types import ChatMessage as CHM
 
 class Message():
     def __init__(self, text: str, user_name: str = "Ava"):
@@ -7,19 +7,19 @@ class Message():
         self.text = text
 
 class ChatMessage(ft.Row):
-    def __init__(self, message: Message):
+    def __init__(self, message: CHM):
         super().__init__()
         self.vertical_alignment="start"
         self.controls=[
                 ft.CircleAvatar(
-                    content=ft.Text(self.get_initials(message.user_name)),
+                    content=ft.Text(self.get_initials("Balo")),
                     color=ft.colors.WHITE,
-                    bgcolor=self.get_avatar_color(message.user_name),
+                    bgcolor=self.get_avatar_color("Balo"),
                 ),
                 ft.Column(
                     [
-                        ft.Text(message.user_name, weight="bold"),
-                        ft.Text(message.text, selectable=True),
+                        ft.Text("Balo", weight="bold"),
+                        ft.Text(message.content, selectable=True),
                     ],
                     tight=True,
                     spacing=5,
@@ -93,35 +93,13 @@ class ChatPage(ft.Column):
             ),
         ]
 
-    # def build(self):
-    #     self.update_page_drawer()
-
     def send_message_click(self, e):
         if self.new_message.value != "":
-            message = Message(self.new_message.value, "Balo")
-            m = ChatMessage(message)
-            self.new_message.value = ""
             self.new_message.disabled = True
-            self.chat.controls.append(m)
-            # ava_response = index.as_query_engine().query(message.text)
-            # response = Message(ava_response.response)
-            # self.chat.controls.append(ChatMessage(response))
+            self.chat.controls.append(ChatMessage(CHM(content=self.new_message.value)))
+            self.new_message.value = ""
+            ava_response = self.page.chat_engine.chat(self.new_message.value)
+            self.chat.controls.append(self.page.chat_memory.get_all()[-1])
             self.new_message.disabled = False
             self.new_message.focus()
             self.update()
-
-    def update_page_drawer(self, control: ft.Control = None):
-        if len(self.page.drawer.controls) == 0:
-            self.page.drawer.controls.extend([
-                ft.Container(height=12),
-                ft.NavigationDrawerDestination(
-                    label="Item 1",
-                    icon=ft.icons.DOOR_BACK_DOOR_OUTLINED,
-                    selected_icon_content=ft.Icon(ft.icons.DOOR_BACK_DOOR),
-                ),
-                ft.Divider(thickness=2),
-            ])
-        if control != None:
-            self.page.drawer.controls.append(control)
-        self.page.drawer.update()
-
