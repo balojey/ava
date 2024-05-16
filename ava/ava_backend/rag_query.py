@@ -54,9 +54,9 @@ Settings.embed_model = embed_model
 """ Setup LLM """
 
 api_key = config.get("LLAMA_API_KEY")
-llm = LlamaAPI(api_key=api_key)
+# llm = LlamaAPI(api_key=api_key)
 # llm = Gemini(api_key=os.getenv("GEMINI_API_KEY"))
-# llm = MockLLM()
+llm = MockLLM()
 Settings.llm = llm
 # service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
 

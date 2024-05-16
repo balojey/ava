@@ -6,7 +6,7 @@ authors = ["Ken Harlbar <balotech514@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 python-dotenv = "1.0.0"
 pymongo = {extras = ["srv"], version = "^4.7.2"}
 llama-index = "^0.10.36"

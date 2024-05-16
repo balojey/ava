@@ -23,8 +23,8 @@ def main(page: ft.Page):
             the sui blockchain and move programming language."""
         )
     )
-    page.chat_db = "ava" # mongodb_client[os.getenv("CHAT_DB_NAME")]
-    page.chat_collection = "chats" # mongodb_client[os.getenv("CHAT_COLLECTION_NAME")]
+    # page.chat_db = "ava" # mongodb_client[os.getenv("CHAT_DB_NAME")]
+    # page.chat_collection = "chats" # mongodb_client[os.getenv("CHAT_COLLECTION_NAME")]
     page.current_chat_doc_id = ""
 
     provider = GitHubOAuthProvider(
@@ -42,23 +42,21 @@ def main(page: ft.Page):
             created_at: datetime.utcnow(),
             updated_at: datetime.utcnow(),
         }
-        saved_chat = page.chat_collection.insert_one(chats).inserted_id
-        page.current_chat_doc_id = f"balo###{str(saved_chat)}"
-
-    def update_chat_in_db():
-        chats = {
-            chats: page.chat_memory.to_dict(),
-            updated_at: datetime.utcnow(),
-        }
-        saved_chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
+        if page.current_chat_doc_id == "":
+            # saved_chat = page.chat_collection.insert_one(chats).inserted_id
+            # page.current_chat_doc_id = f"balo###{str(saved_chat)}"
+            return
+        # saved_chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
         saved_chat.update(chats)
 
     def get_chats_from_db():
-        chats = filter(lambda chat: "balo###" in chat["_id"], page.chat_collection.find())
+        # chats = filter(lambda chat: "balo###" in chat["_id"], page.chat_collection.find())
+        pass
 
     def get_chat_from_db():
-        chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
-        page.chat_memory.from_dict(chat["chats"])
+        # chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
+        # page.chat_memory.from_dict(chat["chats"])
+        pass
 
     def login_click(e):
         page.login(provider)
@@ -109,4 +107,4 @@ def main(page: ft.Page):
     # )
     page.add(ChatPage(page))
 
-ft.app(main)
+ft.app(main, port=8008, export_asgi_app=True)
