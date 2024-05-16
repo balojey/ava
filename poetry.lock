@@ -1287,6 +1287,20 @@ striprtf = ">=0.0.26,<0.0.27"
 pymupdf = ["pymupdf (>=1.23.21,<2.0.0)"]
 
 [[package]]
+name = "llama-index-readers-json"
+version = "0.1.5"
+description = "llama-index readers json integration"
+optional = false
+python-versions = ">=3.8.1,<4.0"
+files = [
+    {file = "llama_index_readers_json-0.1.5-py3-none-any.whl", hash = "sha256:4772289d886eaa2f9c69684ee68aca8faa5cf6e0b45e658a615a86f40f062ab6"},
+    {file = "llama_index_readers_json-0.1.5.tar.gz", hash = "sha256:1fe086fb616da0e17f0d41ba12e016cd8db17b5ba92d7d296a456eb494d9144d"},
+]
+
+[package.dependencies]
+llama-index-core = ">=0.10.1,<0.11.0"
+
+[[package]]
 name = "llama-index-readers-llama-parse"
 version = "0.1.4"
 description = "llama-index readers llama-parse integration"
@@ -4075,4 +4089,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "904b932c2e537497cdbc3ccc86f1629138b045c188068f7141161b23b7487caf"
+content-hash = "0b270b48f13f96c5cce7ee3fe2ed1c056a7e7b54a0da306c8e2a49e9fa940179"

@@ -32,7 +32,7 @@ else:
 
 # Define DB variables
 DB_NAME = 'ava'
-COLLECTION_NAME = 'home_automation'
+COLLECTION_NAME = 'sui'
 INDEX_NAME = 'idx_embedding'
 
 # LlamaIndex will download embeddings models as needed
@@ -66,7 +66,21 @@ index = VectorStoreIndex.from_vector_store(
 )
 
 if __name__ == "__main__":
+    from pprint import pprint
+    from llama_index.core.memory import ChatMemoryBuffer
+    
+    memory = ChatMemoryBuffer.from_defaults()
+    chat_engine = index.as_chat_engine(
+        chat_mode="context",
+        memory=memory,
+        system_prompt=(
+            """Your name is Ava and you are a sui blockchain expert. 
+            You offer help regarding all sorts of issue related to 
+            the sui blockchain and move programming language."""
+        )
+    )
     while True:
         query: str = str(input("\n\nQuery? "))
-        response = index.as_query_engine().query(query)
-        print(response.response)
+        response = chat_engine.stream_chat(query)
+        print(response)
+    chat_engine.reset()
