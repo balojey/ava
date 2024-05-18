@@ -1,8 +1,8 @@
 # Ava
 
-(Live app)[]
+[Live app]()
 
-(Project Writeup)[]
+[Project Writeup](https://peaceful-sleep-735.notion.site/Ava-Empowering-SUI-MOVE-Developers-An-AI-Chat-App-Leveraging-Atlas-MongoDB-1223f4d8a27d48dd81ca281b328a1282?pvs=4)
 
 Ava is a GPT chat model perfectly geered towards Sui/Move developers due to lack of AI support in the domain.
 
@@ -21,7 +21,7 @@ This application was brought to life using the following technologies
 
 *Option 1*
 
-Use Gitpod: go to (https://gitpod/#https://github.com/balojey/ava)[https://gitpod/#https://github.com/balojey/ava]
+Use Gitpod: go to [https://gitpod.io/#https://github.com/balojey/ava](https://gitpod/#https://github.com/balojey/ava)
 
 All dependencies will be installed automatically
 
