@@ -6,7 +6,7 @@ authors = ["Ken Harlbar <balotech514@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 python-dotenv = "1.0.0"
 pymongo = {extras = ["srv"], version = "^4.7.2"}
 llama-index = "^0.10.36"
@@ -23,6 +23,7 @@ flet = "^0.22.1"
 llama-index-readers-json = "^0.1.5"
 llama-index-llms-gemini = "^0.1.7"
 llama-index-llms-huggingface = "^0.2.0"
+streamlit = "^1.34.0"
 
 
 [build-system]

@@ -1,110 +1,142 @@
-import flet as ft
-from pages import ChatPage
-import os
-from datetime import datetime
-from flet.auth.providers import GitHubOAuthProvider
+import streamlit as st
+import os, torch, sys, logging, pymongo
+from dotenv import find_dotenv, dotenv_values
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core import ServiceContext
+from llama_index.vector_stores.mongodb import MongoDBAtlasVectorSearch
+from llama_index.core import StorageContext
+from llama_index.core import SimpleDirectoryReader
+from llama_index.core import VectorStoreIndex
+from llama_index.llms.llama_api import LlamaAPI
+from llama_index.core import Settings
+from llama_index.core.llms import MockLLM
+from llama_index.llms.gemini import Gemini
+from llama_index.llms.huggingface import HuggingFaceLLM
+from llama_index.core import PromptTemplate
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from llama_index.core.memory import ChatMemoryBuffer
-from ava.ava_backend import mongodb_client, index
 
 
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+st.title("Ava - Sui/Move Expert")
 
-def main(page: ft.Page):
-    page.horizontal_alignment = "stretch"
-    page.title = "Ava"
-    page.chat_memory = ChatMemoryBuffer.from_defaults()
-    page.chat_engine = index.as_chat_engine(
-        chat_mode="context",
-        memory=page.chat_memory,
-        system_prompt=(
-            """Your name is Ava and you are a sui blockchain expert. 
-            You offer help regarding all sorts of issue related to 
-            the sui blockchain and move programming language."""
-        )
+# Load Settings
+
+# Change system path to root direcotry
+sys.path.insert(0, '../')
+
+# _ = load_dotenv(find_dotenv()) # read local .env file
+config = dotenv_values(find_dotenv())
+
+ATLAS_URI = config.get('ATLAS_URI')
+
+if not ATLAS_URI:
+    raise Exception ("'ATLAS_URI' is not set.  Please set it above to continue...")
+else:
+    print("ATLAS_URI Connection string found:", ATLAS_URI)
+
+# Define DB variables
+DB_NAME = 'ava'
+COLLECTION_NAME = 'sui'
+INDEX_NAME = 'idx_embedding'
+
+# LlamaIndex will download embeddings models as needed
+# Set llamaindex cache dir to ../cache dir here (Default is system tmp)
+# This way, we can easily see downloaded artifacts
+os.environ['LLAMA_INDEX_CACHE_DIR'] = os.path.join(os.path.abspath('../'), 'cache')
+
+mongodb_client = pymongo.MongoClient(ATLAS_URI)
+
+# Setup Embedding Model
+
+embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+Settings.embed_model = embed_model
+
+# Setup LLM
+
+llm = LlamaAPI(api_key=config.get("LLAMA_API_KEY"))
+# llm = Gemini(api_key=config.get("GEMINI_API_KEY"), model_name="models/gemini-pro")
+# llm = MockLLM()
+# system_prompt = """Your name is Ava and you are a sui blockchain expert. 
+#             You offer help regarding all sorts of issue related to 
+#             the sui blockchain and move programming language."""
+# messages = [
+#     {
+#         "role": "system",
+#         "content": """Your name is Ava and you are a sui blockchain expert. 
+#             You offer help regarding all sorts of issue related to 
+#             the sui blockchain and move programming language.""",
+#     },
+#     {"role": "user", "content": "How is the move programming language different from other smart contract programming language"},
+# ]
+# checkpoint = "StabilityAI/stablelm-tuned-alpha-3b"
+# query_wrapper_prompt = PromptTemplate("<|USER|>{query_str}<|ASSISTANT|>")
+# model = AutoModelForCausalLM.from_pretrained(checkpoint)  # You may want to use bfloat16 and/or move to GPU here
+# tokenizer = AutoTokenizer.from_pretrained(checkpoint, padding_side="left")
+# model.generation_config.pad_token_id = tokenizer.pad_token_id
+# tokenized_chat = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, return_tensors="pt")
+# print("tokenizer: >>>>> : ", tokenizer.decode(tokenized_chat[0]))
+
+# llm = HuggingFaceLLM(
+#     context_window=4096,
+#     max_new_tokens=256,
+#     generate_kwargs={"do_sample": True},
+#     system_prompt=system_prompt,
+#     query_wrapper_prompt=query_wrapper_prompt,
+#     # tokenizer_name=checkpoint,
+#     # model_name=checkpoint,
+#     device_map="auto",
+#     stopping_ids=[50278, 50279, 50277, 1, 0],
+#     tokenizer_kwargs={"max_length": 4096},
+#     tokenizer=tokenizer,
+#     model=model,
+#     # uncomment this if using CUDA to reduce memory usage
+#     # model_kwargs={"torch_dtype": torch.float16}
+# )
+Settings.llm = llm
+# service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
+
+# Connect Llama-index and MongoDB Atlas
+vector_store = MongoDBAtlasVectorSearch(mongodb_client = mongodb_client,
+                                 db_name = DB_NAME, collection_name = COLLECTION_NAME,
+                                 index_name  = 'idx_embedding',
+                                 )
+storage_context = StorageContext.from_defaults(vector_store=vector_store)
+index = VectorStoreIndex.from_vector_store(
+    vector_store=vector_store,
+    # service_context=service_context,
+)
+
+memory = ChatMemoryBuffer.from_defaults()
+
+chat_engine = index.as_chat_engine(
+    chat_mode="context",
+    memory=memory,
+    system_prompt=(
+        """Your name is Ava and you are a sui blockchain expert. 
+        You offer help regarding all sorts of issue related to 
+        the sui blockchain and move programming language."""
     )
-    # page.chat_db = "ava" # mongodb_client[os.getenv("CHAT_DB_NAME")]
-    # page.chat_collection = "chats" # mongodb_client[os.getenv("CHAT_COLLECTION_NAME")]
-    page.current_chat_doc_id = ""
+)
 
-    provider = GitHubOAuthProvider(
-        client_id=GITHUB_CLIENT_ID,
-        client_secret=GITHUB_CLIENT_SECRET,
-        redirect_url="https://8550-balojey-ava-xxh9i2y4xkt.ws-eu111.gitpod.io/oauth_callback",
-    )
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = memory.get_all()
 
-    def reset_chat_memory():
-        page.chat_memory.reset()
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    def save_chat_in_db():
-        chats = {
-            chats: page.chat_memory.to_dict(),
-            created_at: datetime.utcnow(),
-            updated_at: datetime.utcnow(),
-        }
-        if page.current_chat_doc_id == "":
-            # saved_chat = page.chat_collection.insert_one(chats).inserted_id
-            # page.current_chat_doc_id = f"balo###{str(saved_chat)}"
-            return
-        # saved_chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
-        saved_chat.update(chats)
-
-    def get_chats_from_db():
-        # chats = filter(lambda chat: "balo###" in chat["_id"], page.chat_collection.find())
-        pass
-
-    def get_chat_from_db():
-        # chat = page.chat_collection.find_one({"_id": page.current_chat_doc_id})
-        # page.chat_memory.from_dict(chat["chats"])
-        pass
-
-    def login_click(e):
-        page.login(provider)
-
-    def logout_click(e):
-        page.logout()
-
-    login_button = ft.ElevatedButton(text="Continue with Github", on_click=login_click)
-    logout_button = ft.ElevatedButton(text="Logout", on_click=logout_click)
-
-    def on_login(e):
-        print("Login error:", e.error)
-        print("Access token:", page.auth.token.access_token)
-        print("User ID:", page.auth.user.id)
-
-    page.on_login = on_login
-    page.appbar = ft.AppBar(
-        title=ft.Text("Ava"),
-        leading_width=20,
-        bgcolor=ft.colors.BLUE_500,
-        actions=[
-            ft.Container(
-                content=login_button if not page.auth else logout_button
-            )
-        ]
-    )
-    page.drawer = ft.NavigationDrawer(
-        controls=[
-            ft.Container(height=12),
-            ft.NavigationDrawerDestination(
-                label="New Chat",
-                icon=ft.icons.ADD_TASK_OUTLINED,
-                selected_icon_content=ft.Icon(ft.icons.DOOR_BACK_DOOR),
-            ),
-            ft.Divider(thickness=2),
-        ]
-    )
-
-    
-
-    # page.dialog = ft.AlertDialog(
-    #     open=True if not page.auth else False,
-    #     modal=True,
-    #     title=ft.Text("Welcome!"),
-    #     content=ft.Column([ft.Text("Please login to continue")], width=300, height=70, tight=True),
-    #     actions=[login_button],
-    #     actions_alignment="end",
-    # )
-    page.add(ChatPage(page))
-
-ft.app(main, port=8080, export_asgi_app=True)
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        response = chat_engine.chat(prompt)
+        response.is_dummy_stream = True
+        st.write_stream(response.response_gen)
+    st.session_state.messages.append({"role": "assistant", "content": response})
