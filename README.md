@@ -42,10 +42,6 @@ Populate your environment variables
 ```
     ATLAS_URI=
     LLAMA_API_KEY=
-    GITHUB_CLIENT_ID=
-    GITHUB_CLIENT_SECRET=
-    CHAT_DB_NAME=
-    CHAT_COLLECTION_NAME=
 ```
 
 Then, run: `poetry shell ; streamlit run ava/ava_ui/main.py`
