@@ -27,7 +27,7 @@ sys.path.insert(0, '../')
 # _ = load_dotenv(find_dotenv()) # read local .env file
 config = dotenv_values(find_dotenv())
 
-ATLAS_URI = config.get('ATLAS_URI') or st.secrets("ATLAS_URI")
+ATLAS_URI = config.get('ATLAS_URI') or st.secrets["ATLAS_URI"]
 
 if not ATLAS_URI:
     raise Exception ("'ATLAS_URI' is not set.  Please set it above to continue...")
@@ -53,7 +53,7 @@ Settings.embed_model = embed_model
 
 # Setup LLM
 
-llm = LlamaAPI(api_key=config.get("LLAMA_API_KEY") or st.secrets("LLAMA_API_KEY"))
+llm = LlamaAPI(api_key=config.get("LLAMA_API_KEY") or st.secrets["LLAMA_API_KEY"])
 # llm = Gemini(api_key=config.get("GEMINI_API_KEY"), model_name="models/gemini-pro")
 # llm = MockLLM()
 # system_prompt = """Your name is Ava and you are a sui blockchain expert. 
